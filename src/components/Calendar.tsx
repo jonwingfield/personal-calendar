@@ -1,7 +1,16 @@
 'use client';
 
 import React from 'react';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+import { 
+  DndContext, 
+  DragEndEvent, 
+  DragOverlay, 
+  DragStartEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
 import { CalendarDay } from './CalendarDay';
 import { TaskItem } from './TaskItem';
 import { useCalendar, CalendarTask } from '@/hooks/useCalendar';
@@ -35,6 +44,24 @@ export const Calendar: React.FC = () => {
   } = useCalendar();
 
   const [activeTask, setActiveTask] = useState<CalendarTask | null>(null);
+
+  // Configure sensors for both mouse and touch support
+  const mouseSensor = useSensor(MouseSensor, {
+    // Require the mouse to move by 10 pixels before activating
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  
+  const touchSensor = useSensor(TouchSensor, {
+    // Press delay of 250ms, with tolerance of 5px of movement
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  });
+  
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   const calendarDays = getCalendarDays();
   const today = new Date();
@@ -76,7 +103,7 @@ export const Calendar: React.FC = () => {
   }
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="max-w-7xl mx-auto p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

@@ -122,7 +122,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{
+        ...style,
+        touchAction: 'none'
+      }}
       className={`
         bg-white p-2 rounded border shadow-sm group border-l-4
         ${CATEGORY_COLORS[task.category] || CATEGORY_COLORS.other}
@@ -136,6 +139,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
         <div className="flex items-start gap-1 flex-1 min-w-0">
           <div 
             className="cursor-move p-1 hover:bg-white/50 rounded flex-shrink-0 mt-0.5"
+            style={{ touchAction: 'none' }}
             {...listeners}
             {...attributes}
             title="Drag to move task"

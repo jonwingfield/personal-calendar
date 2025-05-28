@@ -6,7 +6,7 @@ A Next.js calendar application with drag-and-drop task management. Perfect for p
 
 - **Month View Calendar**: Navigate through months with a clean, intuitive interface
 - **Task Management**: Add, edit, and delete tasks with ease
-- **Drag & Drop**: Reschedule tasks by dragging them to different days
+- **Drag & Drop**: Reschedule tasks by dragging them to different days (supports mouse, touch, and keyboard)
 - **Categories**: Organize tasks with color-coded categories (Work, Personal, Health, Shopping, Social, Other)
 - **SQLite Database**: Local data storage with no external dependencies
 - **Responsive Design**: Works on desktop and mobile devices
@@ -106,6 +106,11 @@ A Next.js calendar application with drag-and-drop task management. Perfect for p
 ### Rescheduling Tasks
 - Click and drag any task to a different day
 - The task will be automatically moved to the new date
+
+### Touch Screen Support
+- On touch devices, press and hold a task for 250ms to start dragging
+- Drag the task to the desired day and release to drop
+- The drag handle (grip icon) provides the best touch experience
 
 ### Navigation
 - Use the arrow buttons to navigate between months
