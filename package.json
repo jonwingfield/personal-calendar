@@ -9,7 +9,7 @@
     "lint": "next lint",
     "package": "docker build -t personal-calendar .",
     "deploy": "docker tag personal-calendar:latest $HUBIP:5000/personal-calendar && docker push $HUBIP:5000/personal-calendar",
-    "restart-app": "ssh $HUBNAME -t 'docker pull $HUBNAME:5000/personal-calendar && docker service update --image $HUBNAME:5000/personal-calendar:latest personal-calendar'"
+    "restart-app": "ssh $HUBNAME -t 'docker pull $(hostname):5000/personal-calendar && docker service update --image $(hostname):5000/personal-calendar:latest personal-calendar_personal-calendar'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
