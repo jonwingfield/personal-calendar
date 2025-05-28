@@ -4,7 +4,7 @@ services:
   personal-calendar:
     build: .
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       # Mount the data directory to persist SQLite database
       - calendar-data:/app/data

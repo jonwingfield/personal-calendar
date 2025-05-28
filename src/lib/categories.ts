@@ -16,6 +16,11 @@ export const CATEGORIES: Category[] = [
     colorClass: 'bg-green-100 text-green-800 border-green-200',
   },
   {
+    id: 'chores',
+    label: 'Chores',
+    colorClass: 'bg-orange-100 text-orange-800 border-orange-200',
+  },
+  {
     id: 'personal',
     label: 'Personal',
     colorClass: 'bg-purple-100 text-purple-800 border-purple-200',
@@ -37,4 +42,4 @@ export const CATEGORY_COLORS: Record<string, string> = CATEGORIES.reduce(
 );
 
 // Default category for new tasks
-export const DEFAULT_CATEGORY = 'personal'; 
+export const DEFAULT_CATEGORY = 'training'; 
