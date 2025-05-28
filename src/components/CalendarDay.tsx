@@ -4,12 +4,14 @@ import { TaskItem } from './TaskItem';
 import { CalendarTask } from '@/hooks/useCalendar';
 import { Plus } from 'lucide-react';
 import { CATEGORIES, DEFAULT_CATEGORY } from '@/lib/categories';
+import { DEFAULT_USER, USERS } from '@/lib/users';
 
 interface CalendarDayProps {
   date: Date;
   tasks: CalendarTask[];
   isCurrentMonth: boolean;
   isToday: boolean;
+  selectedUser: string;
   onAddTask: (task: Omit<CalendarTask, 'id' | 'created_at' | 'updated_at'>) => void;
   onUpdateTask: (id: number, updates: Partial<CalendarTask>) => void;
   onDeleteTask: (id: number) => void;
@@ -20,15 +22,21 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
   tasks,
   isCurrentMonth,
   isToday,
+  selectedUser,
   onAddTask,
   onUpdateTask,
   onDeleteTask,
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
+  
+  // Use the selected user as default, but fall back to DEFAULT_USER if "all" is selected
+  const defaultUserForNewTask = selectedUser === 'all' ? DEFAULT_USER : selectedUser;
+  
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
     category: DEFAULT_CATEGORY,
+    user_id: defaultUserForNewTask,
   });
 
   const dateString = date.toISOString().split('T')[0];
@@ -44,13 +52,13 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
         ...newTask,
         date: dateString,
       });
-      setNewTask({ title: '', description: '', category: DEFAULT_CATEGORY });
+      setNewTask({ title: '', description: '', category: DEFAULT_CATEGORY, user_id: defaultUserForNewTask });
       setShowAddForm(false);
     }
   };
 
   const handleCancel = () => {
-    setNewTask({ title: '', description: '', category: DEFAULT_CATEGORY });
+    setNewTask({ title: '', description: '', category: DEFAULT_CATEGORY, user_id: defaultUserForNewTask });
     setShowAddForm(false);
   };
 
@@ -107,11 +115,22 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
           <select
             value={newTask.category}
             onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-            className="w-full text-xs p-1 border rounded mb-2"
+            className="w-full text-xs p-1 border rounded mb-1"
           >
             {CATEGORIES.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={newTask.user_id}
+            onChange={(e) => setNewTask({ ...newTask, user_id: e.target.value })}
+            className="w-full text-xs p-1 border rounded mb-2"
+          >
+            {USERS.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
               </option>
             ))}
           </select>

@@ -5,8 +5,9 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/
 import { CalendarDay } from './CalendarDay';
 import { TaskItem } from './TaskItem';
 import { useCalendar, CalendarTask } from '@/hooks/useCalendar';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, User } from 'lucide-react';
 import { useState } from 'react';
+import { USERS, ALL_USERS_OPTION } from '@/lib/users';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -21,6 +22,8 @@ export const Calendar: React.FC = () => {
     month,
     tasks,
     loading,
+    selectedUser,
+    setSelectedUser,
     addTask,
     updateTask,
     deleteTask,
@@ -89,8 +92,25 @@ export const Calendar: React.FC = () => {
               Today
             </button>
           </div>
-          
+
           <div className="flex items-center gap-4">
+            {/* User Selection Dropdown */}
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-gray-600" />
+              <select
+                value={selectedUser}
+                onChange={(e) => setSelectedUser(e.target.value)}
+                className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value={ALL_USERS_OPTION.id}>{ALL_USERS_OPTION.name}</option>
+                {USERS.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
             <button
               onClick={goToPreviousMonth}
               className="p-2 hover:bg-gray-100 rounded transition-colors"
@@ -138,6 +158,7 @@ export const Calendar: React.FC = () => {
                 tasks={dayTasks}
                 isCurrentMonth={isCurrentMonth(date)}
                 isToday={isToday(date)}
+                selectedUser={selectedUser}
                 onAddTask={addTask}
                 onUpdateTask={updateTask}
                 onDeleteTask={deleteTask}

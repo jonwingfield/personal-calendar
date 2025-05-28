@@ -7,14 +7,18 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date');
     const year = searchParams.get('year');
     const month = searchParams.get('month');
+    const userId = searchParams.get('userId');
 
     let tasks;
     if (year && month) {
       tasks = getTasksByMonth(parseInt(year), parseInt(month));
+      if (userId && userId !== 'all') {
+        tasks = tasks.filter(task => task.user_id === userId);
+      }
     } else if (date) {
-      tasks = getTasks(date);
+      tasks = getTasks(date, userId && userId !== 'all' ? userId : undefined);
     } else {
-      tasks = getTasks();
+      tasks = getTasks(undefined, userId && userId !== 'all' ? userId : undefined);
     }
 
     return NextResponse.json(tasks);
@@ -27,16 +31,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, category, date } = body;
+    const { title, description, category, date, user_id } = body;
 
-    if (!title || !category || !date) {
+    if (!title || !category || !date || !user_id) {
       return NextResponse.json(
-        { error: 'Title, category, and date are required' },
+        { error: 'Title, category, date, and user_id are required' },
         { status: 400 }
       );
     }
 
-    const taskId = createTask({ title, description, category, date });
+    const taskId = createTask({ title, description, category, date, user_id });
     return NextResponse.json({ id: taskId, success: true }, { status: 201 });
   } catch (error) {
     console.error('Error creating task:', error);

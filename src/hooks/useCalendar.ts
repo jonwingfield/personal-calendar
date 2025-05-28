@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Task } from '@/lib/database';
+import { ALL_USERS_OPTION } from '@/lib/users';
 
 export interface CalendarTask extends Task {
   id: number;
@@ -9,6 +10,7 @@ export const useCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState<CalendarTask[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string>(ALL_USERS_OPTION.id);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
@@ -16,7 +18,12 @@ export const useCalendar = () => {
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/tasks?year=${year}&month=${month}`);
+      const url = new URL('/api/tasks', window.location.origin);
+      url.searchParams.set('year', year.toString());
+      url.searchParams.set('month', month.toString());
+      url.searchParams.set('userId', selectedUser);
+      
+      const response = await fetch(url.toString());
       if (response.ok) {
         const data = await response.json();
         setTasks(data);
@@ -26,7 +33,7 @@ export const useCalendar = () => {
     } finally {
       setLoading(false);
     }
-  }, [year, month]);
+  }, [year, month, selectedUser]);
 
   useEffect(() => {
     fetchTasks();
@@ -124,6 +131,8 @@ export const useCalendar = () => {
     loading,
     year,
     month,
+    selectedUser,
+    setSelectedUser,
     addTask,
     updateTask,
     deleteTask,

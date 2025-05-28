@@ -24,10 +24,25 @@ export function getDatabase() {
         description TEXT,
         category TEXT NOT NULL,
         date TEXT NOT NULL,
+        user_id TEXT NOT NULL DEFAULT 'aaron',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Migration: Add user_id column if it doesn't exist
+    try {
+      const checkColumn = db.prepare("PRAGMA table_info(tasks)");
+      const columns = checkColumn.all() as Array<{ name: string; type: string; notnull: number; dflt_value: string | null; pk: number }>;
+      const hasUserColumn = columns.some((col) => col.name === 'user_id');
+      
+      if (!hasUserColumn) {
+        db.exec(`ALTER TABLE tasks ADD COLUMN user_id TEXT NOT NULL DEFAULT 'aaron'`);
+      }
+    } catch (error) {
+      // Column might already exist, ignore error
+      console.log('Migration note:', error);
+    }
   }
   
   return db;
@@ -39,6 +54,7 @@ export interface Task {
   description?: string;
   category: string;
   date: string;
+  user_id: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -46,17 +62,23 @@ export interface Task {
 export function createTask(task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) {
   const database = getDatabase();
   const stmt = database.prepare(
-    'INSERT INTO tasks (title, description, category, date) VALUES (?, ?, ?, ?)'
+    'INSERT INTO tasks (title, description, category, date, user_id) VALUES (?, ?, ?, ?, ?)'
   );
-  const result = stmt.run(task.title, task.description, task.category, task.date);
+  const result = stmt.run(task.title, task.description, task.category, task.date, task.user_id);
   return result.lastInsertRowid;
 }
 
-export function getTasks(date?: string): Task[] {
+export function getTasks(date?: string, userId?: string): Task[] {
   const database = getDatabase();
-  if (date) {
+  if (date && userId) {
+    const stmt = database.prepare('SELECT * FROM tasks WHERE date = ? AND user_id = ? ORDER BY created_at');
+    return stmt.all(date, userId) as Task[];
+  } else if (date) {
     const stmt = database.prepare('SELECT * FROM tasks WHERE date = ? ORDER BY created_at');
     return stmt.all(date) as Task[];
+  } else if (userId) {
+    const stmt = database.prepare('SELECT * FROM tasks WHERE user_id = ? ORDER BY date, created_at');
+    return stmt.all(userId) as Task[];
   }
   const stmt = database.prepare('SELECT * FROM tasks ORDER BY date, created_at');
   return stmt.all() as Task[];

@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { CalendarTask } from '@/hooks/useCalendar';
 import { Trash2, Edit3, GripVertical } from 'lucide-react';
 import { CATEGORIES, CATEGORY_COLORS } from '@/lib/categories';
+import { USERS, USER_COLORS, USER_AVATAR_COLORS } from '@/lib/users';
 
 interface TaskItemProps {
   task: CalendarTask;
@@ -15,6 +16,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
   const [editCategory, setEditCategory] = useState(task.category);
+  const [editUserId, setEditUserId] = useState(task.user_id);
 
   const {
     attributes,
@@ -36,6 +38,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
       title: editTitle,
       description: editDescription,
       category: editCategory,
+      user_id: editUserId,
     });
     setIsEditing(false);
   };
@@ -44,8 +47,20 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
     setEditTitle(task.title);
     setEditDescription(task.description || '');
     setEditCategory(task.category);
+    setEditUserId(task.user_id);
     setIsEditing(false);
   };
+
+  const handleDelete = () => {
+    const confirmed = window.confirm(`Are you sure you want to delete "${task.title}"?`);
+    if (confirmed) {
+      onDelete(task.id!);
+    }
+  };
+
+  // Get user info for display
+  const user = USERS.find(u => u.id === task.user_id);
+  const userInitials = user ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
 
   if (isEditing) {
     return (
@@ -67,11 +82,22 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
         <select
           value={editCategory}
           onChange={(e) => setEditCategory(e.target.value)}
-          className="w-full text-xs mb-2 p-1 border rounded"
+          className="w-full text-xs mb-1 p-1 border rounded"
         >
           {CATEGORIES.map((category) => (
             <option key={category.id} value={category.id}>
               {category.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={editUserId}
+          onChange={(e) => setEditUserId(e.target.value)}
+          className="w-full text-xs mb-2 p-1 border rounded"
+        >
+          {USERS.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
             </option>
           ))}
         </select>
@@ -98,31 +124,25 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
       ref={setNodeRef}
       style={style}
       className={`
-        bg-white p-2 rounded border shadow-sm group
+        bg-white p-2 rounded border shadow-sm group border-l-4
         ${CATEGORY_COLORS[task.category] || CATEGORY_COLORS.other}
+        ${USER_COLORS[task.user_id] || ''}
         ${isDragging ? 'opacity-50 shadow-lg scale-105' : 'hover:shadow-md'}
         transition-all duration-200
       `}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-1 mb-1">
-            <div 
-              className="cursor-move p-1 hover:bg-white/50 rounded flex-shrink-0 mt-0.5"
-              {...listeners}
-              {...attributes}
-              title="Drag to move task"
-            >
-              <GripVertical className="w-3 h-3 opacity-50" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="text-base font-medium leading-tight break-words">{task.title}</h4>
-              {task.description && (
-                <p className="text-sm opacity-80 mt-1 leading-tight break-words">{task.description}</p>
-              )}
-            </div>
+      {/* Title row with drag handle and action buttons */}
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <div className="flex items-start gap-1 flex-1 min-w-0">
+          <div 
+            className="cursor-move p-1 hover:bg-white/50 rounded flex-shrink-0 mt-0.5"
+            {...listeners}
+            {...attributes}
+            title="Drag to move task"
+          >
+            <GripVertical className="w-3 h-3 opacity-50" />
           </div>
-          <span className="text-xs opacity-60 capitalize">{task.category}</span>
+          <h4 className="text-base font-medium leading-tight break-words flex-1">{task.title}</h4>
         </div>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           <button
@@ -138,13 +158,29 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(task.id!);
+              handleDelete();
             }}
             className="p-1 hover:bg-red-200 rounded"
             title="Delete task"
           >
             <Trash2 className="w-3 h-3" />
           </button>
+        </div>
+      </div>
+
+      {/* Description spans full width */}
+      {task.description && (
+        <p className="text-sm opacity-80 leading-tight break-words mb-1">{task.description}</p>
+      )}
+
+      {/* Bottom row with category and user avatar */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs opacity-60 capitalize">{task.category}</span>
+        <div 
+          className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${USER_AVATAR_COLORS[task.user_id] || 'bg-gray-500'}`}
+          title={user?.name || 'Unknown user'}
+        >
+          {userInitials}
         </div>
       </div>
     </div>

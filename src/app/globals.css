@@ -24,3 +24,250 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Print Styles */
+@media print {
+  /* Page setup for landscape orientation */
+  @page {
+    size: letter landscape;
+    margin: 0.5in;
+  }
+
+  /* Reset colors for print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Hide non-essential elements */
+  button,
+  .opacity-60,
+  [title="Add task"],
+  [title="Previous month"],
+  [title="Next month"],
+  [title="Edit task"],
+  [title="Delete task"],
+  [title="Drag to move task"],
+  select,
+  input,
+  textarea,
+  .animate-spin,
+  .cursor-move,
+  .group-hover\\:opacity-100,
+  .hover\\:bg-white\\/50,
+  .hover\\:bg-red-200 {
+    display: none !important;
+  }
+
+  /* Hide drag handles and action buttons */
+  .flex.gap-1.opacity-0,
+  .cursor-move,
+  svg[class*="w-3 h-3"] {
+    display: none !important;
+  }
+
+  /* Main container adjustments */
+  .max-w-7xl {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Header adjustments */
+  .flex.items-center.justify-between.mb-6 {
+    margin-bottom: 0.5rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+  }
+
+  /* Hide user selection and navigation */
+  .flex.items-center.gap-4:last-child {
+    display: none !important;
+  }
+
+  /* Calendar title styling */
+  h1 {
+    font-size: 1.25rem !important;
+    margin: 0 !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+    margin: 0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Days of week header */
+  .grid.grid-cols-7.gap-px.mb-px {
+    margin-bottom: 0 !important;
+  }
+
+  .grid.grid-cols-7.gap-px.mb-px > div {
+    background: #f3f4f6 !important;
+    padding: 0.25rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-align: center;
+    border: 1px solid #d1d5db !important;
+  }
+
+  /* Calendar grid container */
+  .grid.grid-cols-7.gap-px.bg-gray-200.border.border-gray-200 {
+    gap: 0 !important;
+    background: none !important;
+    border: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  /* Calendar day cells */
+  .grid.grid-cols-7.gap-px.bg-gray-200.border.border-gray-200 > div {
+    min-height: 4.5rem !important;
+    padding: 0.25rem !important;
+    border: 1px solid #d1d5db !important;
+    background: white !important;
+    page-break-inside: avoid;
+    margin: 0 !important;
+  }
+
+  /* Today styling for print */
+  .bg-blue-50 {
+    background: #eff6ff !important;
+  }
+
+  .border-blue-300 {
+    border-color: #93c5fd !important;
+  }
+
+  /* Non-current month days */
+  .bg-gray-50 {
+    background: #f9fafb !important;
+    color: #9ca3af !important;
+  }
+
+  /* Date number styling */
+  .text-sm.font-medium {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+  }
+
+  /* Today date circle */
+  .bg-blue-500.text-white.rounded-full {
+    background: #3b82f6 !important;
+    color: white !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    font-size: 0.625rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Task items container */
+  .space-y-1 {
+    gap: 0.125rem !important;
+  }
+
+  /* Task items - enhanced styling for print */
+  .space-y-1 > div,
+  .bg-white.p-2.rounded.border.shadow-sm {
+    margin-bottom: 0.125rem !important;
+    padding: 0.25rem !important;
+    font-size: 0.625rem !important;
+    line-height: 0.75rem !important;
+    border-radius: 0.125rem !important;
+    background: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+  }
+
+  /* Task title styling */
+  .text-base.font-medium {
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    line-height: 0.75rem !important;
+  }
+
+  /* Task description styling */
+  .text-sm.opacity-80 {
+    font-size: 0.5rem !important;
+    line-height: 0.625rem !important;
+    opacity: 0.7 !important;
+  }
+
+  /* Category and user info */
+  .text-xs.opacity-60,
+  .text-xs.font-bold {
+    font-size: 0.5rem !important;
+    line-height: 0.625rem !important;
+  }
+
+  /* User avatar */
+  .w-5.h-5.rounded-full {
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+    font-size: 0.375rem !important;
+  }
+
+  /* Hide task summary at bottom */
+  .mt-4.text-center.text-sm.text-gray-600 {
+    display: none !important;
+  }
+
+  /* Hide drag overlay */
+  [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+
+  /* Force calendar to use full width */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure proper spacing and sizing */
+  .grid.grid-cols-7 {
+    width: 100% !important;
+  }
+
+  /* Hide form elements that might be open */
+  .bg-gray-50.rounded.border,
+  .bg-white.p-2.rounded.border.border-gray-200.shadow-sm:has(input) {
+    display: none !important;
+  }
+
+  /* Hide plus buttons and interactive elements */
+  .hover\\:bg-gray-200,
+  .hover\\:opacity-100,
+  .transition-opacity {
+    display: none !important;
+  }
+
+  /* Calendar container specific print adjustments */
+  .max-w-7xl.mx-auto.p-4 {
+    width: 100% !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Make calendar grid fill remaining space */
+  .grid.grid-cols-7.gap-px.bg-gray-200.border.border-gray-200 {
+    flex: 1 !important;
+    height: calc(100vh - 4rem) !important;
+  }
+
+  /* Ensure each day cell is properly sized */
+  .grid.grid-cols-7.gap-px.bg-gray-200.border.border-gray-200 > div {
+    height: calc((100vh - 4rem) / 6) !important;
+    overflow: hidden !important;
+  }
+
+  /* Hide editing forms completely */
+  .bg-white.p-2.rounded.border.border-gray-200.shadow-sm input,
+  .bg-white.p-2.rounded.border.border-gray-200.shadow-sm textarea,
+  .bg-white.p-2.rounded.border.border-gray-200.shadow-sm select {
+    display: none !important;
+  }
+}
