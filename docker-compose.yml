@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  personal-calendar:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount the data directory to persist SQLite database
+      - calendar-data:/app/data
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+volumes:
+  calendar-data:
+    driver: local 
