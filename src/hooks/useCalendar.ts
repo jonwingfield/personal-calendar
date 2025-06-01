@@ -85,12 +85,39 @@ export const useCalendar = () => {
     }
   };
 
+  // Monthly navigation
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(year, month - 2, 1));
   };
 
   const goToNextMonth = () => {
     setCurrentDate(new Date(year, month, 1));
+  };
+
+  // Daily navigation
+  const goToPreviousDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
+
+  // Weekly navigation
+  const goToPreviousWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 7);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 7);
+    setCurrentDate(newDate);
   };
 
   const goToToday = () => {
@@ -125,6 +152,21 @@ export const useCalendar = () => {
     return days;
   };
 
+  // Get all days in the current week (Sunday to Saturday)
+  const getWeekDays = () => {
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      days.push(day);
+    }
+
+    return days;
+  };
+
   return {
     currentDate,
     tasks,
@@ -138,9 +180,14 @@ export const useCalendar = () => {
     deleteTask,
     goToPreviousMonth,
     goToNextMonth,
+    goToPreviousDay,
+    goToNextDay,
+    goToPreviousWeek,
+    goToNextWeek,
     goToToday,
     getTasksForDate,
     getCalendarDays,
+    getWeekDays,
     fetchTasks,
   };
 }; 

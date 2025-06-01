@@ -66,7 +66,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
     <div
       ref={setNodeRef}
       className={`
-        min-h-[120px] p-2 border border-gray-200 bg-white
+        min-h-[120px] md:min-h-[120px] p-2 border border-gray-200 bg-white
         ${!isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''}
         ${isToday ? 'bg-blue-50 border-blue-300' : ''}
         ${isOver ? 'bg-green-50 border-green-300' : ''}
@@ -78,7 +78,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
         <span
           className={`
             text-sm font-medium
-            ${isToday ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}
+            ${isToday ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs' : ''}
           `}
         >
           {dayNumber}

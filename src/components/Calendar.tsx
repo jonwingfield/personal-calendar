@@ -11,18 +11,16 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core';
-import { CalendarDay } from './CalendarDay';
 import { TaskItem } from './TaskItem';
+import { DailyView } from './DailyView';
+import { WeeklyView } from './WeeklyView';
+import { MonthlyView } from './MonthlyView';
+import { ViewModeToggle } from './ViewModeToggle';
 import { useCalendar, CalendarTask } from '@/hooks/useCalendar';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, User } from 'lucide-react';
+import { useViewMode } from '@/hooks/useViewMode';
+import { Calendar as CalendarIcon, User } from 'lucide-react';
 import { useState } from 'react';
 import { USERS, ALL_USERS_OPTION } from '@/lib/users';
-
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
 
 export const Calendar: React.FC = () => {
   const {
@@ -38,11 +36,17 @@ export const Calendar: React.FC = () => {
     deleteTask,
     goToPreviousMonth,
     goToNextMonth,
+    goToPreviousDay,
+    goToNextDay,
+    goToPreviousWeek,
+    goToNextWeek,
     goToToday,
     getTasksForDate,
     getCalendarDays,
+    getWeekDays,
   } = useCalendar();
 
+  const { viewMode, setViewMode, isMobile } = useViewMode();
   const [activeTask, setActiveTask] = useState<CalendarTask | null>(null);
 
   // Configure sensors for both mouse and touch support
@@ -62,9 +66,6 @@ export const Calendar: React.FC = () => {
   });
   
   const sensors = useSensors(mouseSensor, touchSensor);
-
-  const calendarDays = getCalendarDays();
-  const today = new Date();
 
   const handleDragStart = (event: DragStartEvent) => {
     const task = event.active.data.current as CalendarTask;
@@ -86,14 +87,6 @@ export const Calendar: React.FC = () => {
     setActiveTask(null);
   };
 
-  const isToday = (date: Date) => {
-    return date.toDateString() === today.toDateString();
-  };
-
-  const isCurrentMonth = (date: Date) => {
-    return date.getMonth() === currentDate.getMonth();
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -102,15 +95,70 @@ export const Calendar: React.FC = () => {
     );
   }
 
+  const renderCurrentView = () => {
+    switch (viewMode) {
+      case 'daily':
+        return (
+          <DailyView
+            currentDate={currentDate}
+            tasks={tasks}
+            selectedUser={selectedUser}
+            onAddTask={addTask}
+            onUpdateTask={updateTask}
+            onDeleteTask={deleteTask}
+            onPreviousDay={goToPreviousDay}
+            onNextDay={goToNextDay}
+            getTasksForDate={getTasksForDate}
+          />
+        );
+      case 'weekly':
+        return (
+          <WeeklyView
+            currentDate={currentDate}
+            tasks={tasks}
+            selectedUser={selectedUser}
+            onAddTask={addTask}
+            onUpdateTask={updateTask}
+            onDeleteTask={deleteTask}
+            onPreviousWeek={goToPreviousWeek}
+            onNextWeek={goToNextWeek}
+            getTasksForDate={getTasksForDate}
+            getWeekDays={getWeekDays}
+          />
+        );
+      case 'monthly':
+        return (
+          <MonthlyView
+            currentDate={currentDate}
+            year={year}
+            month={month}
+            tasks={tasks}
+            selectedUser={selectedUser}
+            onAddTask={addTask}
+            onUpdateTask={updateTask}
+            onDeleteTask={deleteTask}
+            onPreviousMonth={goToPreviousMonth}
+            onNextMonth={goToNextMonth}
+            getTasksForDate={getTasksForDate}
+            getCalendarDays={getCalendarDays}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="max-w-7xl mx-auto p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+        <div className={`flex items-center justify-between mb-6 ${isMobile ? 'flex-col gap-4' : ''}`}>
+          <div className={`flex items-center gap-4 ${isMobile ? 'w-full justify-center' : ''}`}>
             <div className="flex items-center gap-2">
               <CalendarIcon className="w-6 h-6 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Personal Calendar</h1>
+              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                Personal Calendar
+              </h1>
             </div>
             <button
               onClick={goToToday}
@@ -120,84 +168,35 @@ export const Calendar: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* User Selection Dropdown */}
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-gray-600" />
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value={ALL_USERS_OPTION.id}>{ALL_USERS_OPTION.name}</option>
-                {USERS.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <button
-              onClick={goToPreviousMonth}
-              className="p-2 hover:bg-gray-100 rounded transition-colors"
-              title="Previous month"
+          {/* View Mode Toggle */}
+          <div className={`flex items-center gap-4 ${isMobile ? 'w-full justify-center' : ''}`}>
+            <ViewModeToggle
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              isMobile={isMobile}
+            />
+          </div>
+
+          {/* User Selection */}
+          <div className={`flex items-center gap-2 ${isMobile ? 'w-full justify-center' : ''}`}>
+            <User className="w-4 h-4 text-gray-600" />
+            <select
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            
-            <h2 className="text-xl font-semibold text-gray-800 min-w-[200px] text-center">
-              {MONTHS[month - 1]} {year}
-            </h2>
-            
-            <button
-              onClick={goToNextMonth}
-              className="p-2 hover:bg-gray-100 rounded transition-colors"
-              title="Next month"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              <option value={ALL_USERS_OPTION.id}>{ALL_USERS_OPTION.name}</option>
+              {USERS.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {/* Days of week header */}
-        <div className="grid grid-cols-7 gap-px mb-px">
-          {DAYS_OF_WEEK.map((day) => (
-            <div
-              key={day}
-              className="bg-gray-100 p-2 text-center text-sm font-medium text-gray-700"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200">
-          {calendarDays.map((date) => {
-            const dateString = date.toISOString().split('T')[0];
-            const dayTasks = getTasksForDate(dateString);
-            
-            return (
-              <CalendarDay
-                key={dateString}
-                date={date}
-                tasks={dayTasks}
-                isCurrentMonth={isCurrentMonth(date)}
-                isToday={isToday(date)}
-                selectedUser={selectedUser}
-                onAddTask={addTask}
-                onUpdateTask={updateTask}
-                onDeleteTask={deleteTask}
-              />
-            );
-          })}
-        </div>
-
-        {/* Task count summary */}
-        <div className="mt-4 text-center text-sm text-gray-600">
-          {tasks.length} task{tasks.length !== 1 ? 's' : ''} in {MONTHS[month - 1]} {year}
-        </div>
+        {/* Current View */}
+        {renderCurrentView()}
       </div>
 
       {/* Drag overlay */}
