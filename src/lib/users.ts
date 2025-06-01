@@ -34,7 +34,7 @@ export const USERS: User[] = [
 
 export const ALL_USERS_OPTION = {
   id: 'all',
-  name: 'ALL',
+  name: 'All',
 } as const;
 
 // Create a lookup object for easy access by user id
