@@ -78,7 +78,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
         <span
           className={`
             text-sm font-medium
-            ${isToday ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs' : ''}
+            ${isToday ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs' : 'w-6 h-6'}
           `}
         >
           {dayNumber}
