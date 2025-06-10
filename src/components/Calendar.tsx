@@ -206,6 +206,7 @@ export const Calendar: React.FC = () => {
             task={activeTask}
             onUpdate={() => {}}
             onDelete={() => {}}
+            onDuplicate={() => {}}
           />
         ) : null}
       </DragOverlay>

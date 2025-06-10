@@ -62,6 +62,21 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
     setShowAddForm(false);
   };
 
+  const handleDuplicate = (task: CalendarTask) => {
+    const tomorrow = new Date(date);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDateString = tomorrow.toISOString().split('T')[0];
+    
+    // Create a duplicate task with the same data but on the next day
+    onAddTask({
+      title: `${task.title}`,
+      description: task.description,
+      category: task.category,
+      user_id: task.user_id,
+      date: tomorrowDateString,
+    });
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -159,6 +174,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
             task={task}
             onUpdate={onUpdateTask}
             onDelete={onDeleteTask}
+            onDuplicate={handleDuplicate}
           />
         ))}
       </div>

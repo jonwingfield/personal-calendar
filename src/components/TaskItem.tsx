@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CalendarTask } from '@/hooks/useCalendar';
-import { Trash2, Edit3, GripVertical } from 'lucide-react';
+import { Trash2, Edit3, GripVertical, Copy } from 'lucide-react';
 import { CATEGORIES, CATEGORY_COLORS } from '@/lib/categories';
 import { USERS, USER_COLORS, USER_AVATAR_COLORS } from '@/lib/users';
 
@@ -9,9 +9,10 @@ interface TaskItemProps {
   task: CalendarTask;
   onUpdate: (id: number, updates: Partial<CalendarTask>) => void;
   onDelete: (id: number) => void;
+  onDuplicate: (task: CalendarTask) => void;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete, onDuplicate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
@@ -56,6 +57,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
     if (confirmed) {
       onDelete(task.id!);
     }
+  };
+
+  const handleDuplicate = () => {
+    onDuplicate(task);
   };
 
   // Get user info for display
@@ -135,7 +140,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
       `}
     >
       {/* Title row with drag handle and action buttons */}
-      <div className="flex items-start justify-between gap-2 mb-1">
+      <div className="flex items-start gap-2 mb-1 relative">
         <div className="flex items-start gap-1 flex-1 min-w-0">
           <div 
             className="cursor-move p-1 hover:bg-white/50 rounded flex-shrink-0 mt-0.5"
@@ -146,29 +151,47 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, onDelete }) 
           >
             <GripVertical className="w-3 h-3 opacity-50" />
           </div>
-          <h4 className="text-base font-medium leading-tight break-words flex-1">{task.title}</h4>
+          <h4 className="text-base font-medium leading-tight break-words flex-1 pr-2">{task.title}</h4>
         </div>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsEditing(true);
-            }}
-            className="p-1 hover:bg-white/50 rounded"
-            title="Edit task"
-          >
-            <Edit3 className="w-3 h-3" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete();
-            }}
-            className="p-1 hover:bg-red-200 rounded"
-            title="Delete task"
-          >
-            <Trash2 className="w-3 h-3" />
-          </button>
+        {/* Overlaid action buttons - always visible on touch, hover on non-touch */}
+        <div className="absolute top-0 right-0 
+          opacity-100 
+          md:opacity-0 md:group-hover:opacity-100 
+          transition-all duration-300 transform 
+          translate-x-0 
+          md:translate-x-1 md:group-hover:translate-x-0">
+          <div className="flex gap-0.5 md:gap-1 p-1 md:p-1.5 bg-white/90 md:bg-white/80 backdrop-blur-sm border border-white/50 rounded-md md:rounded-lg shadow-md md:shadow-lg ring-1 ring-black/5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              className="p-1 md:p-1 hover:bg-gray-100 rounded transition-colors touch-manipulation flex items-center justify-center min-w-[28px] min-h-[28px] md:min-w-0 md:min-h-0"
+              title="Edit task"
+            >
+              <Edit3 className="w-3 h-3 text-gray-700" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDuplicate();
+              }}
+              className="p-1 md:p-1 hover:bg-blue-100 rounded transition-colors touch-manipulation flex items-center justify-center min-w-[28px] min-h-[28px] md:min-w-0 md:min-h-0"
+              title="Duplicate task"
+            >
+              <Copy className="w-3 h-3 text-blue-600" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+              className="p-1 md:p-1 hover:bg-red-100 rounded transition-colors touch-manipulation flex items-center justify-center min-w-[28px] min-h-[28px] md:min-w-0 md:min-h-0"
+              title="Delete task"
+            >
+              <Trash2 className="w-3 h-3 text-red-600" />
+            </button>
+          </div>
         </div>
       </div>
 
